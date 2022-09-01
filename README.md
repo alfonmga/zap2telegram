@@ -2,6 +2,10 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/alfonmga/zap2telegram.svg)](https://pkg.go.dev/github.com/alfonmga/zap2telegram)
 
+`zap2telegram` is a fantastic way to centralize your program's [zap](https://github.com/uber-go/zap) logs by sending them to a Telegram chat.
+
+![Screenshot 2022-09-01 at 18 48 06](https://user-images.githubusercontent.com/9363272/187970432-617fd4ad-5e65-49ab-aadb-0248b05e6637.png)
+
 ## Install
 
 Via go get tool
@@ -121,7 +125,3 @@ func main() {
 	logger.Error("something went wrong", zap.String("user_id", "12345"))
 }
 ```
-
----
-
-[Browse the docs for all the available options](https://pkg.go.dev/github.com/alfonmga/zap2telegram).

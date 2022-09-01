@@ -16,8 +16,6 @@ $ go get -u github.com/alfonmga/zap2telegram
 
 ## Usage
 
-Example usage:
-
 ```go
 package main
 

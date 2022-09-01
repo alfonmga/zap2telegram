@@ -46,9 +46,9 @@ func main() {
 	zap2telegramCore, err := zap2telegram.NewTelegramCore(
 		tgBotAccessToken,
 		[]int64{tgChatID},
-		zap2telegram.WithLevel(zapcore.InfoLevel), // Send only Info and above logs to Telegram
-		zap2telegram.WithNotificationOn([]zapcore.Level{zap.ErrorLevel, zap.PanicLevel, zap.FatalLevel}), // Enable message notification only this levels
-		zap2telegram.WithQueue(context.Background(), 11*time.Second, 330),                                // Use queue to send messages to Telegram every 11 seconds and set queue size to 330 messages at most
+		zap2telegram.WithLevel(zapcore.InfoLevel), // send only Info and above logs to Telegram
+		zap2telegram.WithNotificationOn([]zapcore.Level{zap.ErrorLevel, zap.PanicLevel, zap.FatalLevel}), // enable message notification only this levels
+		zap2telegram.WithQueue(context.Background(), 11*time.Second, 330),                                // use queue to send messages to Telegram every 11 seconds and set queue size to 330 messages at most
 		zap2telegram.WithParseMode(tgMsgParseMode),
 		zap2telegram.WithFormatter(func(e zapcore.Entry, fields []zapcore.Field) string {
 			escapedAppName := tgbotapi.EscapeText(tgMsgParseMode, appName)
@@ -69,14 +69,14 @@ func main() {
 				escapedCaller,
 				escapedMessage,
 			)
-			// Add fields to the message
+			// add fields to the message
 			msgFields := ""
 			for _, field := range fields {
 				enc := zapcore.NewMapObjectEncoder()
 				field.AddTo(enc)
 				for k, v := range enc.Fields {
 					if k == "app_name" {
-						continue // Skip app_name field because it is already in the message
+						continue // skip app_name field because it is already in the message
 					}
 					escapedK := tgbotapi.EscapeText(tgMsgParseMode, k)
 					escapedV := tgbotapi.EscapeText(tgMsgParseMode, fmt.Sprintf("%+v", v))

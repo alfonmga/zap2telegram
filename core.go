@@ -4,6 +4,7 @@ package zap2telegram
 import (
 	"context"
 	"errors"
+	"go.uber.org/zap"
 	"time"
 
 	"go.uber.org/zap/zapcore"
@@ -39,12 +40,12 @@ type TelegramCore struct {
 	// through the use of `.With()`. These fields should never be cleared after
 	// logging a single entry.
 	inheritedFields []zapcore.Field
-	telegramClient  *telegramClient // telegram client
-	levels          []zapcore.Level // only send message if level is in this list
-	async           bool            // send messages asynchronously
-	queue           bool            // use a queue to send messages
-	intervalQueue   time.Duration   // queue interval between messages sending
-	entriesChan     chan chanEntry  // channel to store messages in queue
+	telegramClient  *telegramClient      // telegram client
+	enabler         zapcore.LevelEnabler // only send message if level is in this list
+	async           bool                 // send messages asynchronously
+	queue           bool                 // use a queue to send messages
+	intervalQueue   time.Duration        // queue interval between messages sending
+	entriesChan     chan chanEntry       // channel to store messages in queue
 }
 type chanEntry struct {
 	entry  zapcore.Entry
@@ -65,7 +66,7 @@ func NewTelegramCore(botAccessToken string, chatIDs []int64, opts ...Option) (za
 	c := &TelegramCore{
 		inheritedFields: []zapcore.Field{},
 		telegramClient:  telegramClient,
-		levels:          []zapcore.Level{defaultLevel},
+		enabler:         zap.NewAtomicLevelAt(defaultLevel),
 		async:           defaultAsyncOpt,
 		queue:           defaultQueueOpt,
 	}
@@ -79,12 +80,7 @@ func NewTelegramCore(botAccessToken string, chatIDs []int64, opts ...Option) (za
 }
 
 func (c *TelegramCore) Enabled(l zapcore.Level) bool {
-	for _, level := range c.levels {
-		if level == l {
-			return true
-		}
-	}
-	return false
+	return c.enabler.Enabled(l)
 }
 func (c *TelegramCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *zapcore.CheckedEntry {
 	if c.Enabled(entry.Level) {

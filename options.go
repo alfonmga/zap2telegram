@@ -2,6 +2,7 @@ package zap2telegram
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"time"
 
 	"go.uber.org/zap/zapcore"
@@ -9,11 +10,18 @@ import (
 
 type Option func(*TelegramCore) error
 
+// WithLevelEnabler uses the provided enabler to decide which level should be logged
+func WithLevelEnabler(l zapcore.LevelEnabler) Option {
+	return func(h *TelegramCore) error {
+		h.enabler = l
+		return nil
+	}
+}
+
 // WithLevel sends messages equal or above specified level
 func WithLevel(l zapcore.Level) Option {
 	return func(h *TelegramCore) error {
-		levels := getLevelThreshold(l)
-		h.levels = levels
+		h.enabler = zap.NewAtomicLevelAt(l)
 		return nil
 	}
 }
@@ -21,7 +29,7 @@ func WithLevel(l zapcore.Level) Option {
 // WithStrongLevel sends only messages with specified level
 func WithStrongLevel(l zapcore.Level) Option {
 	return func(h *TelegramCore) error {
-		h.levels = []zapcore.Level{l}
+		h.enabler = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool { return lvl == l })
 		return nil
 	}
 }
